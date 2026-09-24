@@ -1,20 +1,17 @@
-# 1. LOAD REQUIRED PACKAGES
-library(dplyr)     # Data wrangling
-library(car)       # Anova and VIF testing
-library(agricolae) # Post-hoc LSD/Tukey tests
-library(corrplot)  # Correlation matrix visualization
-library(MASS)      # Stepwise regression (stepAIC)
-library(vegan)     # Redundancy Analysis (RDA)
-library(ggplot2)   # Publication graphics
-library(ggpubr)    # Multi-panel plots
-library(Hmisc)     # Pearson correlation matrix with p-values
-library(tibble)    # Data frame utilities
+library(dplyr)     
+library(car)       
+library(agricolae) 
+library(corrplot)  
+library(MASS)      
+library(vegan)     
+library(ggplot2)   
+library(ggpubr)    
+library(Hmisc)     
+library(tibble)    
 
-# 2. DATA IMPORT & CLEANING
 df <- read.csv("C:/Users/user/OneDrive/Desktop/thesis complete data.csv")  
 colnames(df) <- make.names(colnames(df))  
 
-# Clean and standardize variable definitions globally
 df <- df %>%  
   mutate( 
     Land_Type = as.factor(Land.Type),  
@@ -30,7 +27,7 @@ df <- df %>%
     Mr_r      = as.numeric(Mr.r)
   ) 
 
-# 3. SUMMARY STATISTICS BY LAND USE
+# SUMMARY STATISTICS BY LAND USE
 summary_stats <- df %>%  
   group_by(Land_Type) %>%  
   summarise( 
@@ -45,15 +42,15 @@ summary_stats <- df %>%
   )  
 cat("=== SUMMARY STATISTICS ===\n")  
 print(summary_stats) 
+
 # SECTION 3.5: DIAGNOSTIC EVALUATION OF DATA NORMALITY (SHAPIRO-WILK TESTS)
-# ==============================================================================
 cat("\n=================================================================\n")
 cat(" SECTION 3.5: SHAPIRO-WILK NORMALITY TESTS \n")
 cat("=================================================================\n\n")
 
 all_vars <- c("pH", "Clay", "OM", "N", "P2O5", "K", "Mr_g", "Mr_r", "S", "k")
 
-# 1. Overall Dataset Normality (N = 30)
+# Overall Dataset Normality (N = 30)
 cat("--- 1. OVERALL DATASET NORMALITY (N = 30) ---\n")
 overall_norm <- data.frame(Variable = character(), W = numeric(), p_value = numeric(), stringsAsFactors = FALSE)
 
@@ -63,7 +60,7 @@ for (v in all_vars) {
 }
 print(overall_norm, row.names = FALSE)
 
-# 2. Within-Group Normality Range by Land Type (n = 10 each)
+# Within-Group Normality Range by Land Type (n = 10 each)
 cat("\n--- 2. WITHIN-GROUP NORMALITY RANGE BY LAND TYPE (n = 10) ---\n")
 group_norm <- data.frame(Variable = character(), Min_p = numeric(), Max_p = numeric(), Range_Fmt = character(), stringsAsFactors = FALSE)
 
@@ -85,7 +82,7 @@ for (v in all_vars) {
 }
 print(group_norm[, c("Variable", "Range_Fmt")], row.names = FALSE)
 
-# 3. OLS Regression Residual Normality
+#  OLS Regression Residual Normality
 cat("\n--- 3. OLS REGRESSION RESIDUAL NORMALITY ---\n")
 full_k_model <- lm(k ~ OM + N + P2O5 + K + pH + Clay, data = df)
 full_S_model <- lm(S ~ OM + N + P2O5 + K + pH + Clay, data = df)
@@ -230,12 +227,12 @@ print_ols_metrics <- function(model, model_name) {
   print(sum_mod$coefficients) 
 }
 
-# 1. Stepwise OLS Regression Model for Initial Decomposition Rate (k)  
+#  Stepwise OLS Regression Model for Initial Decomposition Rate (k)  
 full_k <- lm(k ~ OM + N + P2O5 + K + pH + Clay, data = df) 
 step_k <- MASS::stepAIC(full_k, direction = "both", trace = FALSE) 
 print_ols_metrics(step_k, "MODEL 1: INITIAL DECOMPOSITION RATE (k)")
 
-# 2. Stepwise OLS Regression Model for Soil Stabilization Factor (S)  
+#  Stepwise OLS Regression Model for Soil Stabilization Factor (S)  
 full_S <- lm(S ~ OM + N + P2O5 + K + pH + Clay, data = df) 
 step_S <- MASS::stepAIC(full_S, direction = "both", trace = FALSE) 
 print_ols_metrics(step_S, "MODEL 2: SOIL STABILIZATION FACTOR (S)")
