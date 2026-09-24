@@ -1,16 +1,13 @@
-
 library(tidyverse)
-library(ggpubr)     # For publication-ready plots
-library(corrplot)   # For correlation matrix visualization
+library(ggpubr)    
+library(corrplot)  
 library(ggplot2)
-# 2. Read Dataset
+
 data_path <- "C:/Users/user/OneDrive/Desktop/thesis complete data.csv"
 df <- read.csv(data_path, stringsAsFactors = FALSE)
 
-# Clean string values in Land.Type
 df$Land.Type <- trimws(as.character(df$Land.Type))
 
-# Check and convert Land.Type dynamically
 if (any(is.na(df$Land.Type)) || any(df$Land.Type == "") || length(unique(df$Land.Type)) < 2) {
   # Fallback: assign categories by plot order (10 Forest, 10 Agriculture, 10 Grassland)
   df$Land.Type <- factor(rep(c("Protected Forest", "Peri-Urban Agriculture", "Degraded Grassland"), each = 10),
@@ -20,16 +17,12 @@ if (any(is.na(df$Land.Type)) || any(df$Land.Type == "") || length(unique(df$Land
   df$Land.Type <- factor(df$Land.Type)
 }
 
-# Rename k column to a clean variable name
 df$k <- df$k..day.1.
 
-# Verify factor conversion (must show counts across all categories)
 cat("--- Land Use Category Breakdown ---\n")
 print(table(df$Land.Type))
 
 #  FIGURE 2: Boxplots of k and S across Land Types
-
-
 # Plot A: Decomposition Rate Constant (k)
 p_k <- ggplot(df, aes(x = Land.Type, y = k, fill = Land.Type)) +
   geom_boxplot(alpha = 0.7, outlier.shape = NA) +
@@ -57,7 +50,6 @@ fig1 <- ggarrange(p_k, p_S, ncol = 2, nrow = 1)
 ggsave("Figure1_TBI_Metrics.png", fig1, width = 9, height = 4.5, dpi = 300)
 print(fig1)
 
-
 # One-Way ANOVA & Post-Hoc Tests
 cat("\n--- ANOVA: Decomposition Rate (k) ---\n")
 fit_k <- aov(k ~ Land.Type, data = df)
@@ -77,7 +69,6 @@ print(summary(model_k))
 cat("\n--- OLS Regression: S ---\n")
 model_S <- lm(S ~ OM.... + N.... + P2O5.kg.ha. + K..kg.ha. + pH, data = df)
 print(summary(model_S))
-
 
 #  FIGURE 3: Pearson Correlation Heatmap
 
@@ -124,7 +115,6 @@ arrows <- data.frame(
   category = c("Forest", "Agriculture", "Grassland")
 )
 
-# 3. Create and assign the plot to 'p'
 p <- ggplot() +
   # Box Cards
   geom_rect(data = nodes, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = category, color = category),
