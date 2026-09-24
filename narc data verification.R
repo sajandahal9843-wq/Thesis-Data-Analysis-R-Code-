@@ -1,13 +1,7 @@
-# Install required spatial packages if needed
-if (!require("terra")) install.packages("terra")
-if (!require("sf")) install.packages("sf")
-if (!require("dplyr")) install.packages("dplyr")
-
 library(terra)
 library(sf)
 library(dplyr)
 
-# 1. Extracted sampling plot data from image
 extracted_pts <- data.frame(
   Plot_ID   = sprintf("P%02d", 1:30),
   Land_Type = c(rep("Forest", 10), rep("Peri-Urban", 10), rep("Grassland", 10)),
@@ -37,10 +31,10 @@ extracted_pts <- data.frame(
                       272.24, 303.49, 247.44, 245.89, 261.83, 258.53, 250.54, 266.63, 257.71, 254.07)
 )
 
-# 2. Convert coordinates to spatial points vector (EPSG:4326)
+# Convert coordinates to spatial points vector (EPSG:4326)
 pts_vect <- vect(extracted_pts, geom = c("Longitude", "Latitude"), crs = "EPSG:4326")
 
-# 3. Path setup for Desktop rasters
+# Path setup for rasters
 desktop_dir <- "C:/Users/user/OneDrive/Desktop"
 
 raster_files <- c(
@@ -52,7 +46,7 @@ raster_files <- c(
   P2O5 = file.path(desktop_dir, "p2o5.tif")
 )
 
-# 4. Extract raster values at plot locations and compare
+# Extract raster values at plot locations and compare
 results <- extracted_pts %>% select(Plot_ID, Land_Type)
 
 for (var_name in names(raster_files)) {
@@ -83,7 +77,7 @@ for (var_name in names(raster_files)) {
   }
 }
 
-# 5. Check for any non-zero differences
+# Check for any non-zero differences
 cat("\n=== RASTER VERIFICATION SUMMARY ===\n")
 diff_cols <- grep("_diff$", names(results), value = TRUE)
 
