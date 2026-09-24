@@ -13,7 +13,7 @@ if (any(is.na(df$Land.Type)) || any(df$Land.Type == "") || length(unique(df$Land
   df$Land.Type <- factor(rep(c("Protected Forest", "Peri-Urban Agriculture", "Degraded Grassland"), each = 10),
                          levels = c("Protected Forest", "Peri-Urban Agriculture", "Degraded Grassland"))
 } else {
-  # Automatic factor conversion based on actual unique text present in CSV
+  
   df$Land.Type <- factor(df$Land.Type)
 }
 
